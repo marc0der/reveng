@@ -2,7 +2,7 @@
 
 ## Context
 
-The `claude-legacy-reveng-plugin` repo is currently a pure Claude Code plugin (skills + agents + hooks, no runnable entrypoint). `reveng-cli.md` at the repo root specifies a new standalone bash CLI that wraps the plugin so mixed-skill teams can drive the full reverse-engineering pipeline (curate → analyse → synthesise → decompose) without knowing Claude Code's internal flags. It mirrors the conventions of Defra's sister tool `ralph` (re-engineering loop runner), and is independently installable.
+The `claude-legacy-reveng-plugin` repo is currently a pure Claude Code plugin (skills + agents + hooks, no runnable entrypoint). `reveng-cli.md` at the repo root specifies a new standalone bash CLI that wraps the plugin so mixed-skill teams can drive the full reverse-engineering pipeline (curate → analyse → synth → decompose) without knowing Claude Code's internal flags. It mirrors the conventions of Defra's sister tool `ralph` (re-engineering loop runner), and is independently installable.
 
 This plan covers building that CLI end-to-end in this repo, plus aligning the spec with the actual code (the spec's paths lag recent refactors to `output/html/` and `output/transcripts/`).
 
@@ -44,7 +44,7 @@ Do **not** touch: any file under `skills/`, `agents/`, `hooks/`, `.claude-plugin
 5. **`cmd_curate` (non-batch)** — prompt-invokes `digital-content-curator` agent. Verify first with `--dry-run`, then one real input pair.
 6. **`cmd_curate --batch`** — port the README's Troubleshooting bash loop into the function; honour `--model` and skip-if-exists resume logic; `--dry-run` lists which files would be processed.
 7. **`cmd_analyse`** — loops sequentially over the four analyst agents; `--only domain|interaction|app|db` selects one. Validation per §Prereq validation.
-8. **`cmd_synthesise`** — single agent invocation of `product-manager`.
+8. **`cmd_synth`** — single agent invocation of `product-manager`.
 9. **`cmd_decompose`** — single agent invocation of `prd-to-features`.
 10. **Move + correct `reveng-cli.md`** → `specs/reveng-cli.md` (§Spec corrections).
 11. **README update** — install instructions, quick-start, cross-link.
@@ -82,8 +82,8 @@ Prerequisite binaries: check `command -v claude` and `command -v jq` at script s
 | `curate` | at least one of `screenshots/*.{png,jpg,jpeg,gif,bmp,webp}` or `transcripts/*.txt` (excluding `*_curated.txt`) | "Error: no inputs found. Place files in `screenshots/` or `transcripts/`, or run `reveng init` first." |
 | `analyse` (domain/interaction) | at least one `output/html/*.html` or `output/transcripts/*_curated.txt` | "Error: no curated content. Run `reveng curate` first." |
 | `analyse` (app/db) | at least one file under `src/` (`find src -type f -print -quit`) | "Error: no source under `src/`. Place legacy source there." |
-| `synthesise` | all four of `output/{domain,interaction,application,database}-analysis.md` | "Error: missing analysis files: <list>. Run `reveng analyse` first." |
-| `decompose` | `output/PRD.md` | "Error: `output/PRD.md` not found. Run `reveng synthesise` first." |
+| `synth` | all four of `output/{domain,interaction,application,database}-analysis.md` | "Error: missing analysis files: <list>. Run `reveng analyse` first." |
+| `decompose` | `output/PRD.md` | "Error: `output/PRD.md` not found. Run `reveng synth` first." |
 
 ## Spec corrections (when moving to `specs/reveng-cli.md`)
 
@@ -98,7 +98,7 @@ Prerequisite binaries: check `command -v claude` and `command -v jq` at script s
 
 - `agents/digital-content-curator.md` — `curate` prompts this agent by name.
 - `agents/business-analyst.md`, `interaction-analyst.md`, `application-developer.md`, `database-analyst.md` — `analyse`.
-- `agents/product-manager.md` — `synthesise`.
+- `agents/product-manager.md` — `synth`.
 - `agents/prd-to-features.md` (which internally spawns `feature-writer.md`) — `decompose`.
 - `skills/image-to-html/SKILL.md`, `skills/curate-transcript/SKILL.md` — invoked directly by `curate --batch`.
 - README Troubleshooting bash loop — the reference implementation for `curate --batch`.
@@ -108,7 +108,7 @@ Prerequisite binaries: check `command -v claude` and `command -v jq` at script s
 1. **Dry-run every command** — `./reveng <cmd> --dry-run` prints the composed `claude …` argv. Assert plugin-dir, model, prompt are correct. No Claude calls, no cost.
 2. **`reveng init`** — run in `mktemp -d`, confirm expected tree and `.gitignore` content; re-run and confirm idempotency.
 3. **Install/uninstall** — `REVENG_BIN_DIR=/tmp/b REVENG_CONFIG_DIR=/tmp/c ./install.sh`; run `/tmp/b/reveng version`; then `rm -rf /tmp/{b,c}`.
-4. **End-to-end smoke (manual, one small fixture)** — drop one PNG and one short `.txt` into a scratch dir, `reveng curate -m sonnet`, verify `output/html/*.html` and `output/transcripts/*_curated.txt` exist. Skip `synthesise`/`decompose` from automated runs; test manually.
+4. **End-to-end smoke (manual, one small fixture)** — drop one PNG and one short `.txt` into a scratch dir, `reveng curate -m sonnet`, verify `output/html/*.html` and `output/transcripts/*_curated.txt` exist. Skip `synth`/`decompose` from automated runs; test manually.
 5. **Prereq failures** — run each command with prerequisites missing; confirm exit 1 and the exact documented error text.
 6. **`--verbose`** — confirm raw stream-json appears on stderr, final result text on stdout.
 

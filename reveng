@@ -7,7 +7,7 @@ PLUGIN_DIR="$CONFIG_DIR/plugin"
 
 # Default models per command
 CURATE_DEFAULT_MODEL="sonnet"
-SYNTHESISE_DEFAULT_MODEL="opus"
+SYNTH_DEFAULT_MODEL="opus"
 DECOMPOSE_DEFAULT_MODEL="opus"
 
 # ── Usage ────────────────────────────────────────────────────────────────────
@@ -18,7 +18,7 @@ Usage: reveng <command> [options]
 
 Commands:
   curate       Prepare screenshots and transcripts for analysis
-  synthesise   Run analysis agents and produce the PRD
+  synth        Run analysis agents and produce the PRD
   decompose    Decompose the PRD into feature specifications
   sandbox      Start a devcontainer for the current project
   init         Scaffold directory structure and .gitignore
@@ -106,7 +106,7 @@ validate_inputs() {
         return 1
       fi
       ;;
-    synthesise)
+    synth)
       local has_html=false
       local has_curated=false
       for f in output/html/*.html; do
@@ -130,7 +130,7 @@ validate_inputs() {
     decompose)
       if [[ ! -f "output/PRD.md" ]]; then
         echo "Error: output/PRD.md not found." >&2
-        echo "Run 'reveng synthesise' first to produce the PRD." >&2
+        echo "Run 'reveng synth' first to produce the PRD." >&2
         return 1
       fi
       ;;
@@ -251,12 +251,12 @@ EOF
     "$DRY_RUN"
 }
 
-cmd_synthesise() {
-  parse_flags "$SYNTHESISE_DEFAULT_MODEL" "$@"
+cmd_synth() {
+  parse_flags "$SYNTH_DEFAULT_MODEL" "$@"
 
   if [[ "$SHOW_HELP" == "true" ]]; then
     cat <<'EOF'
-Usage: reveng synthesise [options]
+Usage: reveng synth [options]
 
 Runs the four analysis agents and synthesises results into a Product
 Requirements Document using the product-manager agent.
@@ -270,7 +270,7 @@ EOF
     return 0
   fi
 
-  validate_inputs synthesise
+  validate_inputs synth
   run_claude \
     "Run the \`product-manager\` agent to analyse the application and produce the PRD." \
     "$MODEL" \
@@ -488,7 +488,7 @@ EOF
 
 case "${1:-}" in
   curate)      shift; cmd_curate "$@" ;;
-  synthesise)  shift; cmd_synthesise "$@" ;;
+  synth)       shift; cmd_synth "$@" ;;
   decompose)   shift; cmd_decompose "$@" ;;
   sandbox)     shift; cmd_sandbox "$@" ;;
   init)        shift; cmd_init "$@" ;;

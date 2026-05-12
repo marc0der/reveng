@@ -4,7 +4,7 @@
 
 `reveng` is a standalone bash CLI that wraps the existing claude-legacy-reveng-plugin, providing a command-driven developer experience for reverse engineering legacy applications within Defra's Legacy Application Programme (LAP).
 
-It is a companion to [ralph](https://github.com/DEFRA/ralph) (the autonomous AI coding agent loop runner used in the re-engineering phase). Ralph handles re-engineering (`ralph plan`, `ralph build`); reveng handles reverse engineering (`reveng curate`, `reveng synthesise`, `reveng decompose`). Both tools provide their own `sandbox` command for running inside a devcontainer. The two tools share conventions but are independently installable.
+It is a companion to [ralph](https://github.com/DEFRA/ralph) (the autonomous AI coding agent loop runner used in the re-engineering phase). Ralph handles re-engineering (`ralph plan`, `ralph build`); reveng handles reverse engineering (`reveng curate`, `reveng synth`, `reveng decompose`). Both tools provide their own `sandbox` command for running inside a devcontainer. The two tools share conventions but are independently installable.
 
 ## Design Principles
 
@@ -106,7 +106,7 @@ reveng curate -m opus
 reveng curate --dry-run
 ```
 
-### `reveng synthesise`
+### `reveng synth`
 
 Runs the four analysis agents (where their outputs are missing) and synthesises the results into a Product Requirements Document.
 
@@ -136,8 +136,8 @@ Runs the four analysis agents (where their outputs are missing) and synthesises 
 
 **Example**:
 ```bash
-reveng synthesise
-reveng synthesise -m sonnet --verbose
+reveng synth
+reveng synth -m sonnet --verbose
 ```
 
 ### `reveng decompose`
@@ -188,7 +188,7 @@ Starts (or reuses) a devcontainer for the current working directory and drops th
 | Mount | Purpose |
 |-------|---------|
 | `$PWD` → `/workspace` | The project (workspace folder) |
-| `$(command -v reveng)` → `/usr/local/bin/reveng` | The CLI itself, so `reveng curate`/`synthesise`/`decompose` work inside |
+| `$(command -v reveng)` → `/usr/local/bin/reveng` | The CLI itself, so `reveng curate`/`synth`/`decompose` work inside |
 | `~/.config/reveng` → `/home/node/.config/reveng` | Plugin content, container config |
 | `~/.claude` → `/home/node/.claude` | Claude Code credentials and settings |
 | `~/.ssh` (if exists) → `/home/node/.ssh` | Git SSH access |
@@ -300,7 +300,7 @@ Each `cmd_*` function passes a fixed, one-line prompt. These are taken verbatim 
 | Command | Prompt |
 |---------|--------|
 | `curate` | `` Please could you run the `digital-content-curator` agent to prepare all the screenshots and transcripts for analysis? Thank you. `` |
-| `synthesise` | `` Please could you run the `product-manager` agent to analyse the application and produce the PRD? Thank you. `` |
+| `synth` | `` Run the `product-manager` agent to analyse the application and produce the PRD. `` |
 | `decompose` | `` Please could you run the `prd-to-features` agent to decompose the PRD into individual feature specifications? Thank you. `` |
 
 The prompts are short and stable, so they live as string literals in the bash script rather than in template files. If a prompt grows or needs templating (e.g. `{{GOAL}}` substitution like ralph), it should be moved to `~/.config/reveng/prompts/<command>.md` and resolved via a `resolve_prompt` helper — but this is not required for the initial implementation.
@@ -329,14 +329,14 @@ PLUGIN_DIR="$CONFIG_DIR/plugin"
 
 # Default models per command
 CURATE_DEFAULT_MODEL="sonnet"
-SYNTHESISE_DEFAULT_MODEL="opus"
+SYNTH_DEFAULT_MODEL="opus"
 DECOMPOSE_DEFAULT_MODEL="opus"
 
 usage()          { ... }
 cmd_version()    { ... }
 cmd_init()       { ... }
 cmd_curate()     { ... }
-cmd_synthesise() { ... }
+cmd_synth()      { ... }
 cmd_decompose()  { ... }
 cmd_sandbox()    { ... }  # devcontainer up + exec zsh; handles --rebuild and `clean` subcommand
 sandbox_clean()  { ... }  # docker rm -f the container labelled with this workspace
@@ -349,7 +349,7 @@ validate_inputs()  { ... }  # Checks prerequisite files exist
 # Main dispatch
 case "${1:-}" in
     curate)      shift; cmd_curate "$@" ;;
-    synthesise)  shift; cmd_synthesise "$@" ;;
+    synth)       shift; cmd_synth "$@" ;;
     decompose)   shift; cmd_decompose "$@" ;;
     sandbox)     shift; cmd_sandbox "$@" ;;
     init)        shift; cmd_init "$@" ;;
@@ -367,7 +367,7 @@ Commands that depend on prior stages validate inputs before invoking Claude:
 | Command | Validates |
 |---------|-----------|
 | `curate` | At least one file in `screenshots/` or `transcripts/` |
-| `synthesise` | At least one file in `output/html/` and at least one file in `output/transcripts/*_curated.txt` (the product-manager agent enforces the same prerequisite internally) |
+| `synth` | At least one file in `output/html/` and at least one file in `output/transcripts/*_curated.txt` (the product-manager agent enforces the same prerequisite internally) |
 | `decompose` | `output/PRD.md` exists |
 
 Validation failures print a clear message pointing to the prerequisite command:

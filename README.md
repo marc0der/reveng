@@ -78,7 +78,7 @@ All `reveng` commands run headlessly — they invoke Claude Code in `--dangerous
 |---------|---------|
 | `reveng init` | Scaffold `screenshots/`, `transcripts/`, `src/`, `output/` and add the intermediate-output entries to `.gitignore` |
 | `reveng curate` | Run the `digital-content-curator` agent to prepare screenshots and transcripts for analysis (default model: `sonnet`) |
-| `reveng synthesise` | Run the `product-manager` agent to produce `output/PRD.md` from curated content (default model: `opus`) |
+| `reveng synth` | Run the `product-manager` agent to produce `output/PRD.md` from curated content (default model: `opus`) |
 | `reveng decompose` | Run the `prd-to-features` agent to decompose `output/PRD.md` into `output/features/FT-*.md` (default model: `opus`) |
 | `reveng sandbox` | Start or attach to a devcontainer for the current project (supports `--rebuild` and `clean` subcommand) |
 | `reveng version` | Print the CLI version and exit |
@@ -86,7 +86,7 @@ All `reveng` commands run headlessly — they invoke Claude Code in `--dangerous
 
 ### Global flags
 
-These flags are accepted by the `curate`, `synthesise`, and `decompose` commands:
+These flags are accepted by the `curate`, `synth`, and `decompose` commands:
 
 | Flag | Default | Description |
 |------|---------|-------------|
@@ -102,8 +102,8 @@ Each stage validates its inputs before invoking Claude and points the user at th
 | Command | Requires |
 |---------|----------|
 | `curate` | At least one file in `screenshots/` or `transcripts/` |
-| `synthesise` | At least one `output/html/*.html` and one `output/transcripts/*_curated.txt` (run `reveng curate` first) |
-| `decompose` | `output/PRD.md` exists (run `reveng synthesise` first) |
+| `synth` | At least one `output/html/*.html` and one `output/transcripts/*_curated.txt` (run `reveng curate` first) |
+| `decompose` | `output/PRD.md` exists (run `reveng synth` first) |
 
 ### `reveng sandbox` workflow
 
@@ -116,7 +116,7 @@ reveng init                 # scaffold project directories
 reveng sandbox              # start or attach to the project's container
 # inside the container:
 node@sandbox:/workspace$ reveng curate
-node@sandbox:/workspace$ reveng synthesise
+node@sandbox:/workspace$ reveng synth
 node@sandbox:/workspace$ reveng decompose
 node@sandbox:/workspace$ exit
 
