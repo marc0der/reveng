@@ -4,7 +4,6 @@ description: >
   Legacy application source code analyst for .NET/VB codebases.
   Use this agent to extract workflows, behaviours, domain model, and business
   logic from source code under src/ for downstream PRD generation.
-model: claude-sonnet-4-20250514
 tools: Read, Write, Glob, Grep, Bash(mkdir*)
 memory: project
 ---

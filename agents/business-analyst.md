@@ -4,7 +4,6 @@ description: >
   Strategic DDD analyst for legacy application domain knowledge.
   Use this agent to extract ubiquitous language, bounded contexts, subdomains,
   and a context map from curated interview transcripts for downstream PRD generation.
-model: claude-sonnet-4-20250514
 tools: Read, Write, Glob, Skill, Bash(mkdir*)
 memory: project
 ---

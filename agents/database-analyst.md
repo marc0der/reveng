@@ -4,7 +4,6 @@ description: >
   Legacy database analyst for SQL Server codebases.
   Use this agent to extract database schema, stored procedure logic, triggers,
   and constraints from SQL files and inline SQL under src/ for downstream PRD generation.
-model: claude-sonnet-4-20250514
 tools: Read, Write, Glob, Grep, Bash(mkdir*)
 memory: project
 ---

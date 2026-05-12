@@ -4,7 +4,6 @@ description: >
   Content preparation specialist for legacy application raw material.
   Use this agent to convert UI screenshots into semantic HTML mockups and
   curate interview transcripts, readying them for downstream analysis.
-model: claude-sonnet-4-20250514
 tools: Glob, Task, Bash(mkdir*), Skill
 memory: project
 ---

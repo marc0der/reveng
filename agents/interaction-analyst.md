@@ -4,7 +4,6 @@ description: >
   Interaction analysis specialist for legacy application screens and user workflows.
   Use this agent to stitch HTML mockups with curated interview transcripts
   into a comprehensive interaction analysis for downstream PRD generation.
-model: claude-sonnet-4-20250514
 tools: Read, Write, Glob, Skill, Bash(mkdir*)
 memory: project
 ---
