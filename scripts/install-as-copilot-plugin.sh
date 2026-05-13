@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_RAW="https://raw.githubusercontent.com/DEFRA/claude-legacy-reveng-plugin/c7f3fcb70d8954e6f31387729c984a10856c6eeb"
+REPO_RAW="https://raw.githubusercontent.com/marc0der/reveng/c7f3fcb70d8954e6f31387729c984a10856c6eeb"
 TARGET_AGENTS=".github/agents"
 TARGET_SKILLS=".github/skills"
 
