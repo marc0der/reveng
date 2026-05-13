@@ -6,6 +6,6 @@
     "name": "marc0der"
   },
   "repository": "https://github.com/marc0der/reveng",
-  "license": "OGL-UK-3.0",
+  "license": "MIT",
   "keywords": ["legacy", "reverse-engineering", "modernisation"]
 }
