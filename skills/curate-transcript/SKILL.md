@@ -6,7 +6,7 @@ allowed-tools: Read, Edit, Bash(mkdir*;cp*)
 argument-hint: [transcript-path]
 ---
 
-You are curating a Defra LAP stakeholder interview transcript. Your job is to remove off-topic passages. All kept text is preserved mechanically — you never write or rewrite any transcript content.
+You are curating a stakeholder interview transcript. Your job is to remove off-topic passages. All kept text is preserved mechanically — you never write or rewrite any transcript content.
 
 ## Input
 
