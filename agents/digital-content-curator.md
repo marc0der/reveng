@@ -47,16 +47,11 @@ Wait for all screenshot subagents to return before continuing.
 
 ### Phase C — Process transcripts
 
-For each transcript, launch a Task subagent (to isolate the skill from your context). Launch all transcript subagents in parallel in a single response. Each skill takes a single argument: the file path. Do not pass any other text in the argument.
+For each transcript, invoke the skill directly. The skill takes a single argument: the file path. Do not pass any other text in the argument.
 
 ```
-Task(
-  subagent_type="general-purpose",
-  prompt="Use the Skill tool to invoke the curate-transcript skill with argument: transcripts/example.txt"
-)
+Skill(skill="curate-transcript", args="transcripts/example.txt")
 ```
-
-Wait for all transcript subagents to return before continuing.
 
 ### Phase D — Verify all outputs exist
 
@@ -65,7 +60,7 @@ Re-glob for the expected outputs and compare against inputs:
 - For each screenshot `screenshots/<name>.<ext>`, verify `output/html/<name>.html` exists
 - For each raw transcript `transcripts/<name>.txt`, verify `output/transcripts/<name>_curated.txt` exists
 
-If any outputs are missing, **retry the failed files** using the same Task subagent pattern. Then verify again.
+If any outputs are missing, **retry the failed files** using the same invocation pattern (Task subagent for screenshots, Skill for transcripts). Then verify again.
 
 ### Phase E — Report
 
