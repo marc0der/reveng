@@ -2,7 +2,7 @@
 
 ## Overview
 
-`reveng` is a standalone bash CLI that wraps the existing claude-legacy-reveng-plugin, providing a command-driven developer experience for reverse engineering legacy applications within Defra's Legacy Application Programme (LAP).
+`reveng` is a standalone bash CLI that wraps the `reveng` Claude Code plugin, providing a command-driven developer experience for reverse-engineering legacy applications.
 
 It is a companion to [ralph](https://github.com/DEFRA/ralph) (the autonomous AI coding agent loop runner used in the re-engineering phase). Ralph handles re-engineering (`ralph plan`, `ralph build`); reveng handles reverse engineering (`reveng curate`, `reveng synth`, `reveng decompose`). Both tools provide their own `sandbox` command for running inside a devcontainer. The two tools share conventions but are independently installable.
 
@@ -19,10 +19,10 @@ Mixed teams: some developers familiar with Claude Code internals, others encount
 
 ## Repository
 
-Lives in the existing `claude-legacy-reveng-plugin` repo. The repo gains:
+Lives in the `reveng` repo. The repo gains:
 
 ```
-claude-legacy-reveng-plugin/
+reveng/
 ├── reveng                    # CLI script (new)
 ├── install.sh                # Installer (new)
 ├── container/                # Devcontainer for `reveng sandbox` (new)
@@ -64,8 +64,8 @@ Override with `REVENG_BIN_DIR` and `REVENG_CONFIG_DIR` environment variables.
 ### Install
 
 ```bash
-git clone https://github.com/DEFRA/claude-legacy-reveng-plugin
-cd claude-legacy-reveng-plugin
+git clone https://github.com/marc0der/reveng
+cd reveng
 ./install.sh
 ```
 
@@ -281,7 +281,7 @@ These flags are accepted by all commands that invoke Claude:
 
 ## Invocation Mechanism
 
-Each command shells out to Claude Code in headless mode, passing a natural-language prompt that asks Claude to run the relevant agent. We do **not** use slash-command invocation (`/agent-name`) because the user-facing pattern documented in the [Defra AI Modernisation Playbook](https://github.com/DEFRA/defra-ai-modernisation-playbook) is to ask the agent by name in plain English. Mirroring that pattern keeps the CLI's behaviour identical to interactive use, so users get the same result whether they run `reveng curate` or paste the prompt into a `claude` session by hand.
+Each command shells out to Claude Code in headless mode, passing a natural-language prompt that asks Claude to run the relevant agent. We do **not** use slash-command invocation (`/agent-name`) — the agent is named in plain English so the CLI's behaviour stays identical to interactive use. Users get the same result whether they run `reveng curate` or paste the prompt into a `claude` session by hand.
 
 ```bash
 claude -p "$prompt" \

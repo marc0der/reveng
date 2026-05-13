@@ -2,7 +2,7 @@
 
 ## Context
 
-The `claude-legacy-reveng-plugin` repo is currently a pure Claude Code plugin (skills + agents + hooks, no runnable entrypoint). `reveng-cli.md` at the repo root specifies a new standalone bash CLI that wraps the plugin so mixed-skill teams can drive the full reverse-engineering pipeline (curate → analyse → synth → decompose) without knowing Claude Code's internal flags. It mirrors the conventions of Defra's sister tool `ralph` (re-engineering loop runner), and is independently installable.
+The `reveng` repo is currently a pure Claude Code plugin (skills + agents + hooks, no runnable entrypoint). `reveng-cli.md` at the repo root specifies a new standalone bash CLI that wraps the plugin so mixed-skill teams can drive the full reverse-engineering pipeline (curate → analyse → synth → decompose) without knowing Claude Code's internal flags. It mirrors the conventions of the related tool `ralph` (re-engineering loop runner), and is independently installable.
 
 This plan covers building that CLI end-to-end in this repo, plus aligning the spec with the actual code (the spec's paths lag recent refactors to `output/html/` and `output/transcripts/`).
 
@@ -27,7 +27,7 @@ Do **not** touch: any file under `skills/`, `agents/`, `hooks/`, `.claude-plugin
    ```
    Claude picks up the agent via its metadata in `agents/*.md` and dispatches through the Task tool. The spec's `claude -p "/agent-name"` literal is incorrect and must be updated.
 
-2. **Skills in `--batch` mode use bare slash commands** (matches the current README's Troubleshooting loop): `claude -p "/image-to-html screenshots/foo.png" --plugin-dir …`. No `defra-legacy-reveng:` namespace prefix needed when loaded via `--plugin-dir`.
+2. **Skills in `--batch` mode use bare slash commands** (matches the current README's Troubleshooting loop): `claude -p "/image-to-html screenshots/foo.png" --plugin-dir …`. No `reveng:` namespace prefix needed when loaded via `--plugin-dir`.
 
 3. **Paths align with the current code**, not the stale spec: `output/html/`, `output/transcripts/*_curated.txt`.
 
