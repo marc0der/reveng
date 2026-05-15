@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/mascot.png" alt="Reveng mascot" width="600">
+</p>
+
 # Reveng
 
 A Claude Code plugin and CLI for reverse-engineering legacy applications.
