@@ -112,7 +112,7 @@ By default, reveng tails Claude's stream-json output and prints a friendly progr
 
 ### Prerequisites between stages
 
-Each stage validates its inputs before invoking Claude and points the user at the preceding command if something is missing:
+Each stage validates its inputs before invoking Claude and points the user at the preceding command if something is missing. If the workspace hasn't been initialised at all (no `.claude/agents/`), the command exits with a friendly error pointing at `reveng init`.
 
 | Command | Requires |
 |---------|----------|
@@ -166,14 +166,18 @@ reveng init                   # re-copies just the missing agent
 
 ```
 reveng/
+├── reveng                            # The CLI script
+├── install.sh                        # Installer
 ├── .claude-plugin/
-│   └── plugin.json                   # Plugin manifest
+│   └── plugin.json                   # Marketplace manifest (not used by the CLI runner)
 ├── skills/<name>/SKILL.md            # Reverse engineering skills
 ├── agents/<name>/AGENT.md            # Custom subagent definitions
 ├── hooks/
 │   └── hooks.json                    # Hook configuration
 ├── templates/
 │   └── workspace-CLAUDE.md           # Workspace CLAUDE.md shipped by `reveng init`
+├── container/                        # Devcontainer used by `reveng sandbox`
+├── specs/                            # Specifications
 ├── CLAUDE.md                         # Conventions for working in this source repo
 └── README.md
 ```
@@ -341,7 +345,7 @@ If this happens, bypass the agent and invoke the skills directly from a bash loo
 
 ```bash
 #!/usr/bin/env bash
-CLAUDE="claude --model claude-sonnet-4-20250514 --dangerously-skip-permissions"
+CLAUDE="claude --model sonnet --dangerously-skip-permissions"
 
 # Process screenshots
 for img in screenshots/*.{png,jpg,jpeg,gif,bmp,webp}; do
