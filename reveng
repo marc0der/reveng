@@ -184,22 +184,56 @@ cmd_version() {
   echo "reveng $VERSION"
 }
 
+copy_with_skip() {
+  local src_root="$1"
+  local dst_root="$2"
+
+  if [[ ! -d "$src_root" ]]; then
+    return 0
+  fi
+
+  while IFS= read -r src_file; do
+    local rel="${src_file#"$src_root"/}"
+    local dst_file="$dst_root/$rel"
+    if [[ -e "$dst_file" ]]; then
+      echo "  Skipped (already exists): $dst_file"
+    else
+      mkdir -p "$(dirname "$dst_file")"
+      cp "$src_file" "$dst_file"
+      echo "  Copied: $dst_file"
+    fi
+  done < <(find "$src_root" -type f)
+}
+
 cmd_init() {
   if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     cat <<'EOF'
 Usage: reveng init
 
-Scaffolds the expected directory structure and .gitignore entries
-in the current working directory.
+Scaffolds the expected directory structure, copies reveng's agents,
+skills, and a workspace CLAUDE.md into the current directory, and
+updates .gitignore.
 
 Creates:
   screenshots/   transcripts/   src/   output/
+  .claude/agents/   .claude/skills/   CLAUDE.md
 
 Adds to .gitignore:
+  .claude/
   output/html/
   output/transcripts/*_curated.txt
+
+Existing files at the destination are skipped (with a warning), so
+local edits to agents, skills, or CLAUDE.md are preserved. To refresh,
+delete the file and re-run init.
 EOF
     return 0
+  fi
+
+  if [[ ! -d "$PLUGIN_DIR" ]]; then
+    echo "Error: reveng content not found at $PLUGIN_DIR." >&2
+    echo "Run install.sh (or install.sh --update) to populate it." >&2
+    return 1
   fi
 
   local dirs=(screenshots transcripts src output)
@@ -208,7 +242,22 @@ EOF
     echo "Created $dir/"
   done
 
-  local gitignore_entries=("output/html/" "output/transcripts/*_curated.txt")
+  echo "Copying agents to .claude/agents/..."
+  copy_with_skip "$PLUGIN_DIR/agents" ".claude/agents"
+
+  echo "Copying skills to .claude/skills/..."
+  copy_with_skip "$PLUGIN_DIR/skills" ".claude/skills"
+
+  if [[ -f "$PLUGIN_DIR/CLAUDE.md" ]]; then
+    if [[ -e "CLAUDE.md" ]]; then
+      echo "Skipped CLAUDE.md (already exists)"
+    else
+      cp "$PLUGIN_DIR/CLAUDE.md" "CLAUDE.md"
+      echo "Created CLAUDE.md"
+    fi
+  fi
+
+  local gitignore_entries=(".claude/" "output/html/" "output/transcripts/*_curated.txt")
   local touched=false
   for entry in "${gitignore_entries[@]}"; do
     if [[ ! -f .gitignore ]] || ! grep -qxF "$entry" .gitignore; then
