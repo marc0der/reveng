@@ -14,12 +14,6 @@ Reveng extends Claude Code with specialised tooling and prompts to help engineer
 
 Reveng is the successor to [DEFRA/claude-legacy-reveng-plugin](https://github.com/DEFRA/claude-legacy-reveng-plugin), the original exploration of this problem space, which was structured as a Claude Code plugin. This repository supersedes that project: the agents and skills have been rebuilt as a stack-agnostic harness around Claude Code, distributed via a small CLI (`reveng`) rather than the plugin mechanism.
 
-## Data Classification
-
-**Only use this tool with source material your organisation permits sending to a third-party LLM provider.** Reverse-engineering input often contains sensitive code, business logic, or personal data — confirm the appropriate classification or handling rules with your organisation before proceeding.
-
-By default, Claude Code sends data to models hosted by Anthropic. Claude Code can also be configured to use [Amazon Bedrock](https://docs.aws.amazon.com/bedrock/) or [Google Cloud Vertex AI](https://cloud.google.com/vertex-ai) — consult your organisation's guidance on approved platforms.
-
 ## Permissions
 
 Claude Code prompts for approval before executing tools such as shell commands and file writes. The `--dangerously-skip-permissions` flag bypasses these prompts, allowing fully unattended operation (e.g. in the batch curation script below).
