@@ -45,11 +45,21 @@ warn_permissions() {
   fi
 }
 
+check_workspace_initialised() {
+  if [[ ! -d ".claude/agents" ]]; then
+    echo "Error: this workspace has not been initialised." >&2
+    echo "Run 'reveng init' first." >&2
+    return 1
+  fi
+}
+
 run_claude() {
   local prompt="$1"
   local model="$2"
   local verbose="${3:-false}"
   local dry_run="${4:-false}"
+
+  check_workspace_initialised
 
   local cmd=(
     claude -p "$prompt"
