@@ -16,9 +16,17 @@ Reveng is the successor to [DEFRA/claude-legacy-reveng-plugin](https://github.co
 
 ## Permissions
 
-Claude Code prompts for approval before executing tools such as shell commands and file writes. The `--dangerously-skip-permissions` flag bypasses these prompts, allowing fully unattended operation (e.g. in the batch curation script below).
+Claude Code prompts for approval before executing tools such as shell commands and file writes. Reveng's CLI commands invoke Claude with `--dangerously-skip-permissions` so they run unattended, bypassing those prompts.
 
-If you use this flag, run Claude Code inside a containerised sandbox (Docker, Podman, or a [devcontainer](https://code.claude.com/docs/en/devcontainer)) so that any unintended actions are contained. If a sandbox is not available, omit the flag and approve each action manually instead.
+To contain any unintended actions, run reveng commands inside the built-in sandbox. `reveng sandbox` starts a [devcontainer](https://code.claude.com/docs/en/devcontainer) with the `reveng` binary and your workspace mounted; Claude inside the container has no access to anything outside it. See the [`reveng sandbox` workflow](#reveng-sandbox-workflow) below.
+
+```bash
+reveng sandbox      # start the sandbox, drops you into a shell
+# inside the container:
+reveng curate       # ... and run reveng commands from there
+```
+
+Running on the host directly (no sandbox) is supported but discouraged. When a reveng command detects it is running outside a sandbox, it prints a loud warning to stderr and asks for interactive confirmation before invoking Claude. In non-interactive contexts (CI, piped input) the warning still prints but the prompt is skipped and the command proceeds.
 
 ## Prerequisites
 
