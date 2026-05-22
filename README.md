@@ -44,8 +44,11 @@ cd reveng
 | Source | Destination |
 |--------|------------|
 | `reveng` | `~/.local/bin/reveng` |
-| `skills/`, `agents/`, `hooks/`, `.claude-plugin/`, `CLAUDE.md` | `~/.config/reveng/plugin/` |
+| `skills/`, `agents/`, `hooks/`, `.claude-plugin/` | `~/.config/reveng/plugin/` |
+| `templates/workspace-CLAUDE.md` | `~/.config/reveng/plugin/CLAUDE.md` |
 | `container/Dockerfile`, `container/devcontainer.json` | `~/.config/reveng/container/` |
+
+These files are the source `reveng init` reads from when populating a workspace.
 
 Override the destinations with the `REVENG_BIN_DIR` and `REVENG_CONFIG_DIR` environment variables. `install.sh` refuses to overwrite an existing installation by default — pass `--update` to upgrade in place:
 
@@ -76,11 +79,11 @@ rm -rf ~/.config/reveng
 
 ## CLI Commands
 
-All `reveng` commands run headlessly — they invoke Claude Code in `--dangerously-skip-permissions` mode with the plugin loaded from `~/.config/reveng/plugin/`. When run outside a devcontainer, a safety warning is printed to stderr. Use `reveng sandbox` (below) to run commands inside an isolated container.
+All `reveng` commands run headlessly — they invoke Claude Code in `--dangerously-skip-permissions` mode. Agents and skills are discovered from the workspace's `.claude/` directory (populated by `reveng init`). When run outside a devcontainer, a safety warning is printed to stderr. Use `reveng sandbox` (below) to run commands inside an isolated container.
 
 | Command | Purpose |
 |---------|---------|
-| `reveng init` | Scaffold `screenshots/`, `transcripts/`, `src/`, `output/` and add the intermediate-output entries to `.gitignore` |
+| `reveng init` | Scaffold `screenshots/`, `transcripts/`, `src/`, `output/`; copy reveng's agents, skills, and a workspace `CLAUDE.md` into the current directory; update `.gitignore` |
 | `reveng sandbox` | Start or attach to a devcontainer for the current project (supports `--rebuild` and `clean` subcommand) |
 | `reveng curate` | Run the `digital-content-curator` agent to prepare screenshots and transcripts for analysis (default model: `sonnet`) |
 | `reveng synth` | Run the `product-manager` agent to produce `output/PRD.md` from curated content (default model: `opus`) |
@@ -111,7 +114,7 @@ Each stage validates its inputs before invoking Claude and points the user at th
 
 ### `reveng sandbox` workflow
 
-`reveng sandbox` provides a containerised environment so Claude Code can run with `--dangerously-skip-permissions` safely. The container is a Node 20 image with Claude Code and standard dev tools preinstalled, and it mounts the current workspace, the installed `reveng` binary, the plugin content, and (optionally) your SSH keys, GitHub CLI auth, and SSH agent socket.
+`reveng sandbox` provides a containerised environment so Claude Code can run with `--dangerously-skip-permissions` safely. The container is a Node 20 image with Claude Code and standard dev tools preinstalled, and it mounts the current workspace, the installed `reveng` binary, and (optionally) your SSH keys, GitHub CLI auth, and SSH agent socket. Reveng's agents and skills travel with the workspace via `.claude/`, so no separate plugin mount is needed.
 
 ```bash
 cd my-legacy-app
@@ -130,31 +133,24 @@ reveng sandbox clean        # remove the project's container
 
 ## Local Development
 
-The plugin is entirely file-based (Markdown and JSON) — there is no build step. Changes to skills, hooks, and configuration are picked up on the next session start.
+The plugin is entirely file-based (Markdown and JSON) — there is no build step. Changes to skills and agents are picked up on the next session start.
 
-### Running the plugin locally
+### Iterating on agents and skills
 
-```bash
-claude --plugin-dir /path/to/reveng
-```
-
-Or add a shell alias for convenience:
+After editing files in this repo, propagate the changes to a workspace by re-running `reveng init` there. Existing files at the destination are skipped (to protect local edits), so to refresh a particular agent or skill, delete it from the workspace's `.claude/` first.
 
 ```bash
-alias claude-reveng='claude --plugin-dir /path/to/reveng'
+# in the reveng source repo
+./install.sh --update         # refresh ~/.config/reveng/plugin/
+
+# in a reveng workspace
+rm -rf .claude/agents/business-analyst
+reveng init                   # re-copies just the missing agent
 ```
-
-### Development workflow
-
-1. Edit a skill, hook, or config file in your editor
-2. Start a new Claude Code session with `--plugin-dir` pointing at your local clone
-3. Verify the plugin loaded with `/skills` or `/mcp` inside the session
-4. Test your changes (e.g. `/reveng:skill-name`)
-5. Iterate — exit the session, tweak files, relaunch
 
 ### Tips
 
-- **Skills** are Markdown files — edit and relaunch, nothing to compile.
+- **Agents** and **skills** are Markdown files — edit and re-init, nothing to compile.
 - **Hooks** run shell commands — test them standalone in your terminal before wiring them into `hooks/hooks.json`.
 - **MCP servers**, if added later, are the only component that may require a build step.
 
@@ -163,18 +159,20 @@ alias claude-reveng='claude --plugin-dir /path/to/reveng'
 ```
 reveng/
 ├── .claude-plugin/
-│   └── plugin.json       # Plugin manifest
-├── skills/               # Reverse engineering skills (slash commands)
+│   └── plugin.json                   # Plugin manifest
+├── skills/<name>/SKILL.md            # Reverse engineering skills
+├── agents/<name>/AGENT.md            # Custom subagent definitions
 ├── hooks/
-│   └── hooks.json        # Hook configuration
-├── agents/               # Custom subagent definitions
-├── CLAUDE.md             # Plugin-level context for Claude
+│   └── hooks.json                    # Hook configuration
+├── templates/
+│   └── workspace-CLAUDE.md           # Workspace CLAUDE.md shipped by `reveng init`
+├── CLAUDE.md                         # Conventions for working in this source repo
 └── README.md
 ```
 
 ## Input and Output
 
-Place your raw material in the host project (the project you run the plugin from) using the directory layout below. The plugin's skills and agents expect these locations.
+Place your raw material in the reveng workspace (the directory where you ran `reveng init`) using the directory layout below. Reveng's skills and agents expect these locations.
 
 ### Inputs (you provide)
 
@@ -337,11 +335,11 @@ flowchart TB
 
 The `digital-content-curator` agent processes files sequentially within a single Claude session. When the number of screenshots or transcripts is large (e.g. 50+), the session may exhaust its turn budget before finishing all files.
 
-If this happens, bypass the agent and invoke the skills directly from a bash loop. Each iteration runs its own Claude process with a fresh context window, so there is no turn budget limit:
+If this happens, bypass the agent and invoke the skills directly from a bash loop. Each iteration runs its own Claude process with a fresh context window, so there is no turn budget limit. Run this from a workspace that has been initialised with `reveng init`:
 
 ```bash
 #!/usr/bin/env bash
-CLAUDE="claude --plugin-dir /path/to/reveng --model claude-sonnet-4-20250514 --dangerously-skip-permissions"
+CLAUDE="claude --model claude-sonnet-4-20250514 --dangerously-skip-permissions"
 
 # Process screenshots
 for img in screenshots/*.{png,jpg,jpeg,gif,bmp,webp}; do
