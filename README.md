@@ -10,6 +10,10 @@ A lightweight harness around [Claude Code](https://docs.anthropic.com/en/docs/cl
 
 Reveng extends Claude Code with specialised tooling and prompts to help engineers understand, document, and modernise legacy systems — regardless of language, framework, or database technology.
 
+## Lineage
+
+Reveng is the successor to [DEFRA/claude-legacy-reveng-plugin](https://github.com/DEFRA/claude-legacy-reveng-plugin), the original exploration of this problem space, which was structured as a Claude Code plugin. This repository supersedes that project: the agents and skills have been rebuilt as a stack-agnostic harness around Claude Code, distributed via a small CLI (`reveng`) rather than the plugin mechanism.
+
 ## Data Classification
 
 **Only use this tool with source material your organisation permits sending to a third-party LLM provider.** Reverse-engineering input often contains sensitive code, business logic, or personal data — confirm the appropriate classification or handling rules with your organisation before proceeding.
