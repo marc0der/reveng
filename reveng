@@ -38,10 +38,24 @@ EOF
 # ── Shared helpers ───────────────────────────────────────────────────────────
 
 warn_permissions() {
-  if [[ "${DEVCONTAINER:-}" != "true" ]]; then
-    echo "⚠️  WARNING: Running with --dangerously-skip-permissions outside a container." >&2
-    echo "⚠️  Claude will have unrestricted access to tools (file writes, shell commands, etc)." >&2
-    echo "⚠️  For safer execution, use a devcontainer or container sandbox." >&2
+  if [[ "${DEVCONTAINER:-}" == "true" ]]; then
+    return 0
+  fi
+
+  echo "⚠️  WARNING: Running with --dangerously-skip-permissions outside a container." >&2
+  echo "⚠️  Claude will have unrestricted access to tools (file writes, shell commands, etc)." >&2
+  echo "⚠️  For safer execution, use a devcontainer or container sandbox." >&2
+
+  if [[ ! -t 0 ]]; then
+    return 0
+  fi
+
+  local reply
+  printf "Continue anyway? [y/N]: " >&2
+  read -r reply
+  if [[ ! "$reply" =~ ^[Yy]([Ee][Ss])?$ ]]; then
+    echo "Aborted." >&2
+    exit 1
   fi
 }
 
