@@ -6,7 +6,7 @@ CONFIG_DIR="${REVENG_CONFIG_DIR:-$HOME/.config/reveng}"
 PLUGIN_DIR="$CONFIG_DIR/plugin"
 
 # Default models per command
-CURATE_DEFAULT_MODEL="sonnet"
+CURATE_DEFAULT_MODEL="opus"
 SYNTH_DEFAULT_MODEL="opus"
 DECOMPOSE_DEFAULT_MODEL="opus"
 
@@ -335,7 +335,7 @@ Prepares raw screenshots and interview transcripts into structured,
 analysis-ready outputs using the digital-content-curator agent.
 
 Options:
-  -m, --model MODEL   Claude model to use (default: sonnet)
+  -m, --model MODEL   Claude model to use (default: opus)
   -v, --verbose        Show Claude commands and raw output
   --dry-run            Print what would be executed without running
   -h, --help           Show this help message

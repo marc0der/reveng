@@ -96,14 +96,14 @@ Prepares raw screenshots and interview transcripts into structured, analysis-rea
 **Options**:
 | Flag | Default | Description |
 |------|---------|-------------|
-| `-m, --model MODEL` | `sonnet` | Claude model to use |
+| `-m, --model MODEL` | `opus` | Claude model to use |
 | `-v, --verbose` | off | Show Claude commands and raw output |
 | `--dry-run` | off | Print what would be executed without running |
 
 **Example**:
 ```bash
 reveng curate
-reveng curate -m opus
+reveng curate -m sonnet
 reveng curate --dry-run
 ```
 
@@ -336,7 +336,7 @@ CONFIG_DIR="${REVENG_CONFIG_DIR:-$HOME/.config/reveng}"
 PLUGIN_DIR="$CONFIG_DIR/plugin"
 
 # Default models per command
-CURATE_DEFAULT_MODEL="sonnet"
+CURATE_DEFAULT_MODEL="opus"
 SYNTH_DEFAULT_MODEL="opus"
 DECOMPOSE_DEFAULT_MODEL="opus"
 

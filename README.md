@@ -91,7 +91,7 @@ All `reveng` commands run headlessly — they invoke Claude Code in `--dangerous
 |---------|---------|
 | `reveng init` | Scaffold `screenshots/`, `transcripts/`, `src/`, `output/`; copy reveng's agents, skills, and a workspace `CLAUDE.md` into the current directory; update `.gitignore` |
 | `reveng sandbox` | Start or attach to a devcontainer for the current project (supports `--rebuild` and `clean` subcommand) |
-| `reveng curate` | Run the `digital-content-curator` agent to prepare screenshots and transcripts for analysis (default model: `sonnet`) |
+| `reveng curate` | Run the `digital-content-curator` agent to prepare screenshots and transcripts for analysis (default model: `opus`) |
 | `reveng synth` | Run the `product-manager` agent to produce `output/PRD.md` from curated content (default model: `opus`) |
 | `reveng decompose` | Run the `prd-to-features` agent to decompose `output/PRD.md` into `output/features/FT-*.md` (default model: `opus`) |
 | `reveng version` | Print the CLI version and exit |
@@ -343,7 +343,7 @@ If this happens, bypass the agent and invoke the skills directly from a bash loo
 
 ```bash
 #!/usr/bin/env bash
-CLAUDE="claude --model sonnet --dangerously-skip-permissions"
+CLAUDE="claude --model opus --dangerously-skip-permissions"
 
 # Process screenshots
 for img in screenshots/*.{png,jpg,jpeg,gif,bmp,webp}; do
