@@ -15,7 +15,7 @@ It is a companion to [ralph](https://github.com/DEFRA/ralph) (the autonomous AI 
 
 ## Target Audience
 
-Mixed teams: some developers familiar with Claude Code internals, others encountering it for the first time. The CLI abstracts away `--plugin-dir`, model flags, and permission flags behind simple commands, but exposes them as options for those who need control.
+Mixed teams: some developers familiar with Claude Code internals, others encountering it for the first time. The CLI abstracts away workspace setup, model flags, and permission flags behind simple commands, but exposes them as options for those who need control.
 
 ## Repository
 
@@ -49,8 +49,11 @@ reveng/
 | Source | Destination |
 |--------|------------|
 | `reveng` | `~/.local/bin/reveng` |
-| `skills/`, `agents/`, `hooks/`, `.claude-plugin/`, `CLAUDE.md` | `~/.config/reveng/plugin/` |
+| `skills/`, `agents/`, `hooks/`, `.claude-plugin/` | `~/.config/reveng/plugin/` |
+| `templates/workspace-CLAUDE.md` | `~/.config/reveng/plugin/CLAUDE.md` |
 | `container/Dockerfile`, `container/devcontainer.json` | `~/.config/reveng/container/` |
+
+The contents of `~/.config/reveng/plugin/` are the source from which `reveng init` copies into a workspace.
 
 Override with `REVENG_BIN_DIR` and `REVENG_CONFIG_DIR` environment variables.
 
@@ -227,7 +230,7 @@ reveng sandbox clean       # remove the project's container
 
 ### `reveng init`
 
-Scaffolds the expected directory structure and `.gitignore` entries in the current working directory. Does not overwrite directories if they already exist.
+Scaffolds the expected directory structure in the current working directory, copies reveng's agents and skills into `.claude/`, copies the workspace `CLAUDE.md`, and updates `.gitignore`. Existing files at the destination are skipped (with a warning), so local edits are preserved across re-runs.
 
 **Creates**:
 ```
@@ -235,13 +238,21 @@ screenshots/
 transcripts/
 src/
 output/
+.claude/agents/<name>/AGENT.md   (copied from ~/.config/reveng/plugin/agents/)
+.claude/skills/<name>/SKILL.md   (copied from ~/.config/reveng/plugin/skills/)
+CLAUDE.md                        (copied from ~/.config/reveng/plugin/CLAUDE.md)
 ```
 
 **Adds to `.gitignore`**:
 ```
+.claude/
 output/html/
 output/transcripts/*_curated.txt
 ```
+
+**Refresh policy**: re-running `reveng init` skips any file that already exists at the destination. To refresh a specific agent or skill, delete it from `.claude/` first and re-run init. The workspace `CLAUDE.md` is treated the same way.
+
+**Prerequisite**: the install must have been run (so `~/.config/reveng/plugin/` exists). If it has not, init exits with an error pointing the user at `install.sh`.
 
 **Options**:
 | Flag | Default | Description |
@@ -285,13 +296,12 @@ Each command shells out to Claude Code in headless mode, passing a natural-langu
 
 ```bash
 claude -p "$prompt" \
-  --plugin-dir "$CONFIG_DIR/plugin" \
   --dangerously-skip-permissions \
   --output-format stream-json \
   --model "$model"
 ```
 
-The `--plugin-dir` flag points to the installed plugin content at `~/.config/reveng/plugin/`, which contains the skills, agents, hooks, and `CLAUDE.md` from the repo. With the plugin loaded, Claude can resolve agent names mentioned in the prompt and dispatch to them via the Task tool.
+Claude Code discovers agents and skills from the workspace's `.claude/` directory, which `reveng init` populates from `~/.config/reveng/plugin/`. Before invoking Claude, each command verifies that `.claude/agents/` exists and exits with a friendly error pointing to `reveng init` if not.
 
 ### Prompts per command
 
@@ -404,7 +414,7 @@ The final result text is printed to stdout. In `--verbose` mode, the full stream
 
 - **Pipeline orchestration**: No `reveng run` command that chains all stages. Users run commands individually and inspect outputs between stages.
 - **Re-engineering commands**: No wrapping of ralph. The two CLIs are independent.
-- **Interactive mode**: All commands run headlessly. For interactive use, run `claude --plugin-dir ~/.config/reveng/plugin/` directly (or open a `reveng sandbox` shell and invoke `claude` from there).
+- **Interactive mode**: All commands run headlessly. For interactive use, `cd` into a reveng workspace (one that has been `reveng init`-ialised) and run `claude` directly — agents and skills are discovered from `.claude/`.
 
 ## Open Questions
 
