@@ -1,9 +1,7 @@
 ---
 name: image-to-html
 description: Converts a UI screenshot of a legacy application into semantic, unstyled mockup HTML. Use this when you need to extract the information structure from a screenshot so downstream agents can reason about the UI without expensive image tokens.
-user-invocable: true
 allowed-tools: Read, Write, Bash(mkdir*)
-argument-hint: [image-path]
 ---
 
 You are converting a legacy application screenshot into semantic, unstyled mockup HTML.

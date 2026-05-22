@@ -35,6 +35,17 @@ Running on the host directly (no sandbox) is supported but discouraged. When a r
 - `jq` (for parsing Claude output in the `reveng` CLI)
 - For `reveng sandbox` only: Docker and the [`devcontainer` CLI](https://github.com/devcontainers/cli) (`npm install -g @devcontainers/cli`)
 
+### Optional: Mermaid Chart connector
+
+The `validate-mermaid` skill (invoked by the `business-analyst`, `interaction-analyst`, and `product-manager` agents to validate Mermaid diagrams in generated outputs) depends on the **Mermaid Chart** connector hosted on claude.ai. To enable it:
+
+1. Sign in at [claude.ai](https://claude.ai)
+2. Open **Settings → Connectors**
+3. Enable **Mermaid Chart**
+4. Restart Claude Code so it picks up the new MCP server
+
+Without this connector the skill exits cleanly with a notice — the rest of the pipeline still runs, but mermaid diagrams in generated outputs are not auto-validated. Note that this is an account-level setting and is not currently available for Claude Code users who are not signed in to claude.ai.
+
 ## Installation
 
 The repository ships with a `reveng` CLI that wraps a set of Claude Code agents and skills in command-driven workflows. See [`specs/reveng-cli.md`](specs/reveng-cli.md) for the full specification.

@@ -1,9 +1,7 @@
 ---
 name: curate-transcript
 description: Curates a stakeholder interview transcript by removing off-topic content (incumbent team agenda, feature requests, distractions) while preserving application walkthrough and domain knowledge verbatim.
-user-invocable: true
 allowed-tools: Read, Edit, Bash(mkdir*;cp*)
-argument-hint: [transcript-path]
 ---
 
 You are curating a stakeholder interview transcript. Your job is to remove off-topic passages. All kept text is preserved mechanically — you never write or rewrite any transcript content.
