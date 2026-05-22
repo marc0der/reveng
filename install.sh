@@ -118,9 +118,9 @@ for dir in skills agents hooks .claude-plugin; do
   fi
 done
 
-# Copy CLAUDE.md
-if [[ -f "$SCRIPT_DIR/CLAUDE.md" ]]; then
-  cp "$SCRIPT_DIR/CLAUDE.md" "$PLUGIN_DIR/CLAUDE.md"
+# Copy workspace CLAUDE.md template (shipped to workspaces by `reveng init`)
+if [[ -f "$SCRIPT_DIR/templates/workspace-CLAUDE.md" ]]; then
+  cp "$SCRIPT_DIR/templates/workspace-CLAUDE.md" "$PLUGIN_DIR/CLAUDE.md"
 fi
 
 echo "  Installed plugin content to $PLUGIN_DIR/"
