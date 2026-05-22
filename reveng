@@ -457,10 +457,8 @@ EOF
     mounts+=("--mount" "type=bind,source=$reveng_bin,target=/usr/local/bin/reveng")
   fi
 
-  # Plugin and container config
-  mounts+=("--mount" "type=bind,source=$CONFIG_DIR,target=/home/node/.config/reveng")
-
   # Note: ~/.claude is mounted via devcontainer.json (not here) to avoid duplicate mounts.
+  # Reveng's agents and skills travel with the workspace via .claude/ so no plugin mount is needed.
 
   # SSH keys (optional)
   if [[ -d "$HOME/.ssh" ]]; then
