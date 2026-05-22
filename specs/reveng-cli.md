@@ -30,8 +30,6 @@ reveng/
 │   └── devcontainer.json
 ├── specs/
 │   └── reveng-cli.md         # This spec
-├── .claude-plugin/
-│   └── plugin.json
 ├── skills/
 ├── agents/
 ├── hooks/
@@ -49,7 +47,7 @@ reveng/
 | Source | Destination |
 |--------|------------|
 | `reveng` | `~/.local/bin/reveng` |
-| `skills/`, `agents/`, `hooks/`, `.claude-plugin/` | `~/.config/reveng/plugin/` |
+| `skills/`, `agents/`, `hooks/` | `~/.config/reveng/plugin/` |
 | `templates/workspace-CLAUDE.md` | `~/.config/reveng/plugin/CLAUDE.md` |
 | `container/Dockerfile`, `container/devcontainer.json` | `~/.config/reveng/container/` |
 

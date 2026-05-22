@@ -110,7 +110,7 @@ echo "  Installed CLI to $BIN_DIR/reveng"
 mkdir -p "$PLUGIN_DIR"
 
 # Copy plugin directories
-for dir in skills agents hooks .claude-plugin; do
+for dir in skills agents hooks; do
   if [[ -d "$SCRIPT_DIR/$dir" ]]; then
     # Remove existing directory content to ensure clean copy
     rm -rf "${PLUGIN_DIR:?}/$dir"

@@ -50,7 +50,7 @@ cd reveng
 | Source | Destination |
 |--------|------------|
 | `reveng` | `~/.local/bin/reveng` |
-| `skills/`, `agents/`, `hooks/`, `.claude-plugin/` | `~/.config/reveng/plugin/` |
+| `skills/`, `agents/`, `hooks/` | `~/.config/reveng/plugin/` |
 | `templates/workspace-CLAUDE.md` | `~/.config/reveng/plugin/CLAUDE.md` |
 | `container/Dockerfile`, `container/devcontainer.json` | `~/.config/reveng/container/` |
 
@@ -168,8 +168,6 @@ reveng init                   # re-copies just the missing agent
 reveng/
 ├── reveng                            # The CLI script
 ├── install.sh                        # Installer
-├── .claude-plugin/
-│   └── plugin.json                   # Marketplace manifest (not used by the CLI runner)
 ├── skills/<name>/SKILL.md            # Reverse engineering skills
 ├── agents/<name>/AGENT.md            # Custom subagent definitions
 ├── hooks/
