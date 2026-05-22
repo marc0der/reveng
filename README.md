@@ -85,7 +85,7 @@ rm -rf ~/.config/reveng
 
 ## CLI Commands
 
-All `reveng` commands run headlessly — they invoke Claude Code in `--dangerously-skip-permissions` mode. Agents and skills are discovered from the workspace's `.claude/` directory (populated by `reveng init`). When run outside a devcontainer, a safety warning is printed to stderr. Use `reveng sandbox` (below) to run commands inside an isolated container.
+All `reveng` commands run headlessly — they invoke Claude Code in `--dangerously-skip-permissions` mode. Agents and skills are discovered from the workspace's `.claude/` directory (populated by `reveng init`). When run outside a devcontainer, a warning is printed to stderr and — in an interactive terminal — you are prompted to confirm before Claude is invoked. Use `reveng sandbox` (below) to run commands inside an isolated container.
 
 | Command | Purpose |
 |---------|---------|
@@ -104,9 +104,11 @@ These flags are accepted by the `curate`, `synth`, and `decompose` commands:
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-m, --model MODEL` | varies by command | Claude model to use |
-| `-v, --verbose` | off | Show Claude commands and raw output |
+| `-v, --verbose` | off | Dump Claude's raw stream-json to stderr (debug) |
 | `--dry-run` | off | Print the `claude` command that would run without executing it |
 | `-h, --help` | | Show command-specific help |
+
+By default, reveng tails Claude's stream-json output and prints a friendly progress stream to stderr — tool calls (e.g. `▸ Read: src/main.py`), assistant text, and a final `✓ Done` line with elapsed time. Pass `-v` to see the raw JSON instead.
 
 ### Prerequisites between stages
 
@@ -203,20 +205,14 @@ Place your raw material in the reveng workspace (the directory where you ran `re
 
 ### Output management
 
-Generated outputs are regeneratable artefacts. Recommended version control approach:
+Generated outputs are regeneratable artefacts. Recommended version-control approach:
 
-**Commit to version control:**
+**Commit:**
 - `output/PRD.md` — the final deliverable
-- `output/features/FT-*.md` — individual feature specifications decomposed from the PRD
+- `output/features/FT-*.md` — individual feature specifications
 - `output/domain-analysis.md`, `output/interaction-analysis.md`, `output/application-analysis.md`, `output/database-analysis.md` — the four analysis files
 
-**Add to `.gitignore` (intermediate/regeneratable):**
-
-```gitignore
-# Reveng intermediate outputs
-output/html/
-output/transcripts/
-```
+**Don't commit:** `output/html/` and `output/transcripts/*_curated.txt` are intermediate regeneratable outputs. `reveng init` adds them to `.gitignore` for you.
 
 ## Component Map
 
