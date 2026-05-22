@@ -67,6 +67,35 @@ check_workspace_initialised() {
   fi
 }
 
+stream_progress() {
+  jq -r --unbuffered '
+    def shorten($n): if length > $n then .[:$n-1] + "…" else . end;
+    if .type == "system" and .subtype == "init" then
+      "▸ Starting Claude session (model: " + (.model // "?") + ")"
+    elif .type == "assistant" then
+      (.message.content // [])[]? |
+      if .type == "text" then
+        if (.text // "" | length) > 0
+        then "  " + (.text | split("\n")[0] | shorten(120))
+        else empty end
+      elif .type == "tool_use" then
+        "▸ " + .name +
+        (if .name == "Bash" then ": " + ((.input.description // .input.command // "") | tostring | shorten(80))
+         elif .name == "Read" or .name == "Write" or .name == "Edit" or .name == "NotebookEdit" then ": " + (.input.file_path // "")
+         elif .name == "Glob" then ": " + (.input.pattern // "")
+         elif .name == "Grep" then ": " + (.input.pattern // "") + (if .input.path then " in " + .input.path else "" end)
+         elif .name == "Skill" then ": " + (.input.skill // "")
+         elif .name == "Task" then ": " + ((.input.subagent_type // .input.description // "") | tostring | shorten(80))
+         else "" end)
+      else empty
+      end
+    elif .type == "result" then
+      "✓ Done" + (if .duration_ms then " (" + ((.duration_ms / 1000) | floor | tostring) + "s)" else "" end)
+    else empty
+    end
+  ' 2>/dev/null
+}
+
 run_claude() {
   local prompt="$1"
   local model="$2"
@@ -94,13 +123,12 @@ run_claude() {
   if [[ "$verbose" == "true" ]]; then
     "${cmd[@]}" 2>&1 | tee /dev/stderr | jq -r 'select(.type == "result") | .result // empty'
   else
-    local output
-    if ! output=$("${cmd[@]}" 2>&1); then
-      echo "Error: Claude exited with a non-zero status." >&2
-      echo "$output" >&2
+    "${cmd[@]}" 2>&1 | tee >(stream_progress >&2) | jq -r 'select(.type == "result") | .result // empty'
+    local claude_exit=${PIPESTATUS[0]}
+    if [[ $claude_exit -ne 0 ]]; then
+      echo "Error: Claude exited with status $claude_exit." >&2
       return 1
     fi
-    echo "$output" | jq -r 'select(.type == "result") | .result // empty'
   fi
 }
 
