@@ -5,6 +5,8 @@ description: >
   Use this agent to extract ubiquitous language, bounded contexts, subdomains,
   and a context map from curated interview transcripts for downstream PRD generation.
 tools: Read, Write, Glob, Skill, Bash(mkdir*)
+skills:
+  - validate-mermaid
 memory: project
 ---
 

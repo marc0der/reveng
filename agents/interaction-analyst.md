@@ -5,6 +5,8 @@ description: >
   Use this agent to stitch HTML mockups with curated interview transcripts
   into a comprehensive interaction analysis for downstream PRD generation.
 tools: Read, Write, Glob, Skill, Bash(mkdir*)
+skills:
+  - validate-mermaid
 memory: project
 ---
 

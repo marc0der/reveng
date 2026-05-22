@@ -6,6 +6,8 @@ description: >
   curated transcripts) to exist before running. Automatically runs any
   missing analyst agents before producing output/PRD.md.
 tools: Read, Write, Task, Glob, Skill
+skills:
+  - validate-mermaid
 memory: project
 ---
 

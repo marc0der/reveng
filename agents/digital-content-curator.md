@@ -5,6 +5,9 @@ description: >
   Use this agent to convert UI screenshots into semantic HTML mockups and
   curate interview transcripts, readying them for downstream analysis.
 tools: Glob, Task, Bash(mkdir*), Skill
+skills:
+  - image-to-html
+  - curate-transcript
 memory: project
 ---
 
