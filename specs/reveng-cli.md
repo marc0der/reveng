@@ -272,7 +272,7 @@ Prints the version and exits.
 
 ```bash
 $ reveng version
-reveng 0.1.0
+reveng 0.2.0
 ```
 
 ### `reveng help`
@@ -333,7 +333,7 @@ The CLI is a single bash script following ralph's conventions:
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="0.1.0"
+VERSION="0.2.0"
 CONFIG_DIR="${REVENG_CONFIG_DIR:-$HOME/.config/reveng}"
 PLUGIN_DIR="$CONFIG_DIR/plugin"
 

@@ -65,7 +65,7 @@ Override the destinations with the `REVENG_BIN_DIR` and `REVENG_CONFIG_DIR` envi
 After installation, verify with:
 
 ```bash
-reveng version    # prints: reveng 0.1.0
+reveng version    # prints: reveng 0.2.0
 ```
 
 If `~/.local/bin` is not already on your `PATH`, add it to your shell profile:
