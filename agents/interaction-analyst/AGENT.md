@@ -4,7 +4,7 @@ description: >
   Interaction analysis specialist for legacy application screens and user workflows.
   Use this agent to stitch HTML mockups with curated interview transcripts
   into a comprehensive interaction analysis for downstream PRD generation.
-tools: Read, Write, Glob, Skill, Bash(mkdir*)
+tools: Read, Write, Edit, Glob, Skill, Bash(mkdir*)
 skills:
   - validate-mermaid
 memory: project
@@ -101,7 +101,7 @@ Begin the output file with a metadata block listing every input file that was re
 -->
 ```
 
-Structure the file with the four sections below. **All four top-level sections are mandatory** — always include every section in every run. If a section has no relevant content, include it with a brief note explaining why (e.g. "No user workflows could be identified from the available transcripts.").
+Structure the file with the 5 sections below. **All 5 top-level sections are mandatory** — always include every section in every run. If a section has no relevant content, include it with a brief note explaining why (e.g. "No user workflows could be identified from the available transcripts.").
 
 ### 1. Screen Inventory
 
@@ -164,10 +164,24 @@ Mapping of which transcripts discuss which screens. Flag:
 - Screens with no transcript coverage
 - Transcript mentions with no matching HTML mockup
 
+### 5. Gaps, Contradictions and Open Questions
+
+A numbered list of everything the transcripts and HTML mockups could not settle. This section is the sole upstream source for the PRD's Open Questions, so a gap you do not record here is lost to every downstream consumer — record it even when it feels minor.
+
+For each entry give:
+- **What is unresolved** — the specific question, in one sentence
+- **Evidence** — the file path(s) and what they do and do not show
+- **Why it matters** — what a rewrite cannot decide without an answer
+
+Include at minimum: contradictions between two sources describing the same thing; concepts referenced but never defined; rules whose trigger conditions or boundaries are unclear; and anything the export, transcript, or mockup set visibly truncates or omits. If you genuinely found none, say so explicitly rather than omitting the section.
+
 ## Output guidance
 
 - **Cite file paths** (`output/html/` and `output/transcripts/` paths) in every section so the reader can trace claims back to source material.
 - **Be exhaustive** — include all discovered content, not just highlights. This output is reference material for PRD generation; completeness matters more than brevity.
+- **Write the file incrementally.** An exhaustive analysis cannot be emitted in a single response — the file ends up truncated partway through, often mid-sentence, with later sections silently missing. Write the first section with Write, then append each subsequent section with Edit (using the file's current last lines as `old_string`). Split any single section that is itself very large into several appends.
+- **Never leave placeholder text.** Write each section's full content at the point you append it. Do not write markers such as `_(populated below)_`, `TODO`, or `TBD` intending to return to them — a run that ends early leaves them unfilled.
+- **Verify before finishing** — Read the finished file back and confirm every section is present, no placeholders remain, and the file ends with a complete sentence rather than mid-word. Append anything missing before reporting completion.
 - Include mermaid flowcharts for every identified workflow.
 - Use consistent markdown structure (headings, bullet lists, file path citations).
 - Do not speculate. If the material does not contain enough information to determine a pattern, say so rather than guessing.

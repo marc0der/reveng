@@ -5,7 +5,7 @@ description: >
   Product Requirements Document. Requires curated content (HTML mockups and
   curated transcripts) to exist before running. Automatically runs any
   missing analyst agents before producing output/PRD.md.
-tools: Read, Write, Task, Glob, Skill
+tools: Read, Write, Edit, Task, Glob, Skill
 skills:
   - validate-mermaid
 memory: project
@@ -84,7 +84,22 @@ If any file appears truncated or malformed, log a warning in the PRD's Open Ques
 
 ### Step 6: Read, cross-reference, and write PRD
 
-Read all four analysis files. Note domain terms, business concepts, process descriptions, entity definitions, business rules, workflows, screens, integrations, and security constraints. Reconcile where multiple analyses describe the same concepts into a unified view. Then write the PRD.
+Read all four analysis files. Note domain terms, business concepts, process descriptions, entity definitions, business rules, workflows, screens, integrations, and security constraints. Reconcile where multiple analyses describe the same concepts into a unified view. Then write the PRD **incrementally**, as described below.
+
+#### Writing the PRD incrementally
+
+The complete PRD is far too large to emit in a single response. Attempting it produces a file that stops partway through — typically around section 9 — with the remaining sections silently missing. You **must** therefore build `output/PRD.md` up across many tool calls:
+
+1. **Write** the title block and section 1 to `output/PRD.md`.
+2. **Edit** the file to append section 2. Then section 3. And so on, **one append per section**, to the end of the document.
+
+Append by using Edit with the last few lines currently in the file as `old_string`, replacing them with themselves plus the new content. Split any single section that is itself large across several appends — one subsection at a time — rather than compressing it to fit one call. Sections 3 (Domain Model), 6 (Workflows), and 9 (Behaviour) will normally each need several appends of their own.
+
+**Incremental writing exists to remove the length limit, not to summarise.** Each section must be as detailed as the source analyses support — the same depth you would produce if that section were the only thing you had to write. Never trade a section's completeness for brevity because there are more sections to come: there is no budget to conserve, and a section that reads as a summary of the analyses has failed. In particular, produce one Given/When/Then scenario for *every* distinct behaviour the analyses describe, and one `####` subsection for *every* named entity, bounded context, screen, and workflow they identify — do not sample, merge, or select representatives.
+
+**Never leave placeholder text.** Write each section's full content at the point you append it. Do not write markers such as `_(populated below)_`, `TODO`, or `TBD` intending to return to them — a run that ends early leaves them unfilled.
+
+**Before finishing, verify completeness**: Read `output/PRD.md` back and confirm every section you intended to include is present and that the file ends with your final section rather than mid-sentence. If any section is missing or truncated, append it with a further Edit. Do not report success until this check passes.
 
 ### Step 7: Validate Mermaid diagrams
 
@@ -275,12 +290,16 @@ Source from the codebase analysis (API calls, service references, configuration 
 
 ### 12. API Contracts
 
-For each inbound service the application exposes to external consumers, document:
+Document the message-level contract of every integration the replacement must reproduce on the wire, in both directions:
 
-| Endpoint | Method | Request shape | Response shape | Error codes | Source |
-|----------|--------|--------------|----------------|-------------|--------|
+| Endpoint | Direction | Method | Request shape | Response shape | Error codes | Source |
+|----------|-----------|--------|--------------|----------------|-------------|--------|
 
-Source from the codebase analysis (ASMX endpoints, WCF contracts, Web API controllers). Only document contracts that external consumers depend on — these represent backward-compatibility requirements for the replacement system.
+**Inbound** — services the application exposes to external consumers (ASMX endpoints, WCF contracts, Web API controllers). These are backward-compatibility requirements for the replacement.
+
+**Outbound** — services the application calls (SOAP/REST connectors, message queues, ESB wrappers). Name the concrete request and response payload types where the analyses identify them; this is the integration surface a rewrite has to reproduce, and it is distinct from section 11, which records only *that* a system is integrated and by what protocol.
+
+Where the application exposes no inbound services, say so explicitly and document the outbound contracts — do not omit the section on the grounds that only one direction is present.
 
 ### 13. Open Questions
 
